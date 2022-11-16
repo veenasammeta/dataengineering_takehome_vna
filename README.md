@@ -1,41 +1,18 @@
 # Fetch Rewards #
 ## Data Engineering Take Home: ETL off a SQS Qeueue ##
 
-You may use any programming language to complete this exercise. We strongly encourage you to write a README to explain how to run your application and summarize your thought process.
+## About Code
 
-## What do I need to do?
-This challenge will focus on your ability to write a small application that can read from an AWS SQS Qeueue, transform that data, then write to a Postgres database. This project includes steps for using docker to run all the components locally, **you do not need an AWS account to do this take home.**
+1. create_and_write_to_queue.py 
+        This script will unzip the gz file and read the contents and push the message to sqs queue.
 
-Your objective is to read JSON data containing user login behavior from an AWS SQS Queue that is made available via [localstack](https://github.com/localstack/localstack). Fetch wants to hide personal identifiable information (PII). The fields `device_id` and `ip` should be masked, but in a way where it is easy for data analysts to identify duplicate values in those fields.
-
-Once you have flattened the JSON data object and masked those two fields, write each record to a Postgres database that is made available via [Postgres's docker image](https://hub.docker.com/_/postgres). Note the target table's DDL is:
-
-```sql
--- Creation of user_logins table
-
-CREATE TABLE IF NOT EXISTS user_logins(
-    user_id             varchar(128),
-    device_type         varchar(32),
-    masked_ip           varchar(256),
-    masked_device_id    varchar(256),
-    locale              varchar(32),
-    app_version         integer,
-    create_date         date
-);
-```
-
-You will have to make a number of decisions as you develop this solution:
-
-*    How will you read messages from the queue?
-*    What type of data structures should be used?
-*    How will you mask the PII data so that duplicate values can be identified?
-*    What will be your strategy for connecting and writing to Postgres?
-*    Where and how will your application run?
-
-**The recommended time to spend on this take home is 2-3 hours.** Make use of code stubs, doc strings, and a next steps section in your README to elaborate on ways that you would continue fleshing out this project if you had the time. For this assignment an ounce of communication and organization is worth a pound of execution.
+2. retreive_messages_and_write_to_db.py
+        This script will read the message from sqs queue and create a pandas dataframe. Then it will mask the device_id and ip and then this dataframe will be written to postgres table 'user_logins'
+3. main.py
+        This script is the main script which will run the above 2 scripts, it will send the messages to the sqs and read the messages from the queue and then mask the data and then push to the table 'user_logins' in postgres database.
 
 ## Project Setup
-1. Fork this repository to a personal Github, GitLab, Bitbucket, etc... account. We will not accept PRs to this project.
+1. Fork this repository to a personal Github, GitLab, Bitbucket, etc... account.
 2. You will need the following installed on your local machine
     * make
         * Ubuntu -- `apt-get -y install make`
@@ -71,7 +48,25 @@ postgres=# select * from user_logins;
 ```
 5. Run `make stop` to terminate the docker containers and optionally run `make clean` to clean up docker resources.
 
-## All done, now what?
-Upload your codebase to a public Git repo (GitHub, Bitbucket, etc.) and email us the link.  Please double-check this is publicly accessible.
 
-Please assume the evaluator does not have prior experience executing programs in your chosen language and needs documentation understand how to run your code
+## Execution:
+
+### Option1: 
+
+Installation and running python script.
+
+```
+pip3 install -r requirements.txt
+python3 scripts/main.py
+
+```
+
+OR
+
+### Option2: 
+
+Just run the below shell script , then it will install libraries and execute the scripts.
+
+```
+sh execution.sh
+```
