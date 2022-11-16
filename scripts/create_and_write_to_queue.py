@@ -10,20 +10,12 @@ def send_messages():
     queue_url = sqs.create_queue(QueueName=QUEUE_NAME)["QueueUrl"]
     print(f"queue_url: [{queue_url}]")
 
-    with gzip.open("/tmp/data/sample_data.json.gz", "r") as f:
+    with gzip.open("data/sample_data.json.gz", "r") as f:
         data = json.load(f)
 
     assert len(data) == 100
-
+    
     for record in data:
         sqs.send_message(QueueUrl=queue_url, MessageBody=json.dumps(record))
 
-    return
-
-
-def main():
-    send_messages()
-
-
-if __name__ == "__main__":
-    main()
+    return queue_url
